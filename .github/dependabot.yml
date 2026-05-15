@@ -1,0 +1,48 @@
+version: 2
+
+updates:
+  # Python dependencies
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "saher-elsayed"
+    labels:
+      - "dependencies"
+      - "python"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+    groups:
+      pytorch-stack:
+        patterns:
+          - "torch*"
+          - "torchvision*"
+      ml-libs:
+        patterns:
+          - "numpy"
+          - "scipy"
+          - "pandas"
+      dev-tools:
+        patterns:
+          - "ruff*"
+          - "black*"
+          - "mypy*"
+          - "pytest*"
+          - "pre-commit*"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "ci"

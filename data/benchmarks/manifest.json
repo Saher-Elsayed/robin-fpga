@@ -1,0 +1,185 @@
+{
+  "schema_version": "1.0",
+  "description": "ROBIN-FPGA benchmark suite — 14 designs across 6 workload classes",
+  "total_designs": 14,
+  "splits": { "train": 10, "validation": 2, "held_out": 2 },
+  "workload_classes": ["DSP", "AI", "Graph", "Control", "Sort", "Crypto"],
+  "designs": [
+    {
+      "name": "FFT-1024",
+      "workload_class": "DSP",
+      "rtl_path": "fft_1024/design.v",
+      "constraints_path": "fft_1024/constraints.xdc",
+      "target_clock_ns": 5.0,
+      "expected_luts": 35000,
+      "split": "train",
+      "license": "BSD-3-Clause",
+      "notes": "1024-point radix-4 pipelined FFT"
+    },
+    {
+      "name": "FIR-256",
+      "workload_class": "DSP",
+      "rtl_path": "fir_256/design.v",
+      "constraints_path": "fir_256/constraints.xdc",
+      "target_clock_ns": 4.0,
+      "expected_luts": 24000,
+      "split": "train",
+      "license": "BSD-3-Clause",
+      "notes": "256-tap symmetric FIR filter"
+    },
+    {
+      "name": "BeamForm-8",
+      "workload_class": "DSP",
+      "rtl_path": "beamform_8/design.v",
+      "constraints_path": "beamform_8/constraints.xdc",
+      "target_clock_ns": 5.0,
+      "expected_luts": 42000,
+      "split": "train",
+      "license": "Apache-2.0",
+      "notes": "8-channel digital beamformer"
+    },
+    {
+      "name": "CORDIC",
+      "workload_class": "DSP",
+      "rtl_path": "cordic/design.v",
+      "constraints_path": "cordic/constraints.xdc",
+      "target_clock_ns": 3.5,
+      "expected_luts": 18000,
+      "split": "train",
+      "license": "MIT",
+      "notes": "CORDIC rotation engine, 24-stage pipelined"
+    },
+    {
+      "name": "GEMM-systolic",
+      "workload_class": "AI",
+      "rtl_path": "gemm_systolic/design.v",
+      "constraints_path": "gemm_systolic/constraints.xdc",
+      "target_clock_ns": 5.0,
+      "expected_luts": 180000,
+      "split": "train",
+      "license": "Apache-2.0",
+      "notes": "16x16 systolic GEMM, INT8 MACs, used as the running example"
+    },
+    {
+      "name": "MobileNet-V2",
+      "workload_class": "AI",
+      "rtl_path": "mobilenet_v2/design.v",
+      "constraints_path": "mobilenet_v2/constraints.xdc",
+      "target_clock_ns": 6.0,
+      "expected_luts": 380000,
+      "split": "train",
+      "license": "Apache-2.0",
+      "notes": "One MobileNet-V2 inverted-residual block"
+    },
+    {
+      "name": "Attn-head",
+      "workload_class": "AI",
+      "rtl_path": "attn_head/design.v",
+      "constraints_path": "attn_head/constraints.xdc",
+      "target_clock_ns": 5.5,
+      "expected_luts": 220000,
+      "split": "validation",
+      "license": "MIT",
+      "notes": "Single transformer attention head"
+    },
+    {
+      "name": "BFS",
+      "workload_class": "Graph",
+      "rtl_path": "bfs/design.v",
+      "constraints_path": "bfs/constraints.xdc",
+      "target_clock_ns": 4.5,
+      "expected_luts": 55000,
+      "split": "train",
+      "license": "BSD-3-Clause",
+      "notes": "BFS engine with on-chip frontier queue"
+    },
+    {
+      "name": "PageRank",
+      "workload_class": "Graph",
+      "rtl_path": "pagerank/design.v",
+      "constraints_path": "pagerank/constraints.xdc",
+      "target_clock_ns": 4.5,
+      "expected_luts": 70000,
+      "split": "train",
+      "license": "BSD-3-Clause",
+      "notes": "PageRank PE with HBM streaming"
+    },
+    {
+      "name": "PCIe-CSR",
+      "workload_class": "Control",
+      "rtl_path": "pcie_csr/design.v",
+      "constraints_path": "pcie_csr/constraints.xdc",
+      "target_clock_ns": 4.0,
+      "expected_luts": 28000,
+      "split": "train",
+      "license": "MIT",
+      "notes": "PCIe Gen5 CSR block"
+    },
+    {
+      "name": "NoC-arbiter",
+      "workload_class": "Control",
+      "rtl_path": "noc_arbiter/design.v",
+      "constraints_path": "noc_arbiter/constraints.xdc",
+      "target_clock_ns": 3.5,
+      "expected_luts": 45000,
+      "split": "train",
+      "license": "Apache-2.0",
+      "notes": "NoC arbiter with QoS classes"
+    },
+    {
+      "name": "Crossbar",
+      "workload_class": "Control",
+      "rtl_path": "crossbar/design.v",
+      "constraints_path": "crossbar/constraints.xdc",
+      "target_clock_ns": 4.5,
+      "expected_luts": 55000,
+      "split": "train",
+      "license": "MIT",
+      "notes": "Permutation crossbar with deadlock avoidance"
+    },
+    {
+      "name": "Bitonic-1024",
+      "workload_class": "Sort",
+      "rtl_path": "bitonic_1024/design.v",
+      "constraints_path": "bitonic_1024/constraints.xdc",
+      "target_clock_ns": 4.5,
+      "expected_luts": 38000,
+      "split": "train",
+      "license": "BSD-3-Clause",
+      "notes": "1024-element bitonic sorter, fully pipelined"
+    },
+    {
+      "name": "AES-128",
+      "workload_class": "Crypto",
+      "rtl_path": "aes_128/design.v",
+      "constraints_path": "aes_128/constraints.xdc",
+      "target_clock_ns": 4.0,
+      "expected_luts": 32000,
+      "split": "validation",
+      "license": "Apache-2.0",
+      "notes": "AES-128 encryption with constant-time S-box"
+    },
+    {
+      "name": "SHA-3",
+      "workload_class": "Crypto",
+      "rtl_path": "sha3/design.v",
+      "constraints_path": "sha3/constraints.xdc",
+      "target_clock_ns": 5.0,
+      "expected_luts": 88000,
+      "split": "held_out",
+      "license": "MIT",
+      "notes": "SHA-3 Keccak-f[1600], 24-round permutation"
+    },
+    {
+      "name": "NTT",
+      "workload_class": "Crypto",
+      "rtl_path": "ntt/design.v",
+      "constraints_path": "ntt/constraints.xdc",
+      "target_clock_ns": 5.0,
+      "expected_luts": 60000,
+      "split": "held_out",
+      "license": "MIT",
+      "notes": "Number-theoretic transform for lattice cryptography"
+    }
+  ]
+}

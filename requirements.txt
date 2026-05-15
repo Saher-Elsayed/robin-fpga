@@ -1,0 +1,31 @@
+# ------- Core ML -------
+torch>=2.1.0,<3.0.0
+numpy>=1.24.0,<2.0.0
+scipy>=1.10.0
+
+# ------- Configuration / IO -------
+pyyaml>=6.0
+jsonschema>=4.17.0
+
+# ------- Plotting (figure regeneration) -------
+matplotlib>=3.7.0
+seaborn>=0.12.0
+pandas>=2.0.0
+
+# ------- CLI -------
+click>=8.1.0
+rich>=13.0.0
+tqdm>=4.65.0
+
+# ------- Logging / tracking -------
+tensorboard>=2.13.0
+
+# ------- Optional: experiment tracking -------
+# wandb>=0.15.0  # uncomment if W&B logging is enabled
+
+# ------- Optional: hyperparameter search -------
+# optuna>=3.3.0
+
+# ------- Build / packaging -------
+setuptools>=68.0.0
+wheel>=0.40.0

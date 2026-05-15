@@ -1,0 +1,32 @@
+# =====================================================================
+# ROBIN-FPGA: Quartus strategy presets (QSF deltas)
+# Sourced by fit.tcl after the project is created/opened.
+# The 192-action policy emits one of these bundles per step.
+# =====================================================================
+
+# ---- placeholder QSF delta — overwritten per-step by the policy ----
+
+# Canonical presets:
+# set_global_assignment -name OPTIMIZATION_MODE "HIGH PERFORMANCE EFFORT"
+# set_global_assignment -name OPTIMIZATION_MODE "AGGRESSIVE PERFORMANCE"
+# set_global_assignment -name OPTIMIZATION_MODE "AGGRESSIVE AREA"
+
+# HyperFlex retiming (Agilex / Stratix-10 only):
+# set_global_assignment -name HYPER_RETIMER_AGGRESSIVE_LOOP_OPTIMIZATIONS ON
+# set_global_assignment -name HYPER_RETIMER_REPLICATION true
+
+# Physical synthesis:
+# set_global_assignment -name PHYSICAL_SYNTHESIS_COMBO_LOGIC ON
+# set_global_assignment -name PHYSICAL_SYNTHESIS_REGISTER_DUPLICATION ON
+# set_global_assignment -name PHYSICAL_SYNTHESIS_REGISTER_RETIMING ON
+
+# Router effort:
+# set_global_assignment -name ROUTER_EFFORT_MULTIPLIER 4.0
+# set_global_assignment -name FITTER_AGGRESSIVE_ROUTABILITY_OPTIMIZATION ALWAYS
+
+# Logiclock regions (analogous to Vivado pblocks):
+# set_global_assignment -name LL_ROOT_REGION ON -section_id "lcr_top"
+# set_global_assignment -name LL_HEIGHT 200 -section_id "lcr_top"
+# set_global_assignment -name LL_WIDTH 200 -section_id "lcr_top"
+
+# ---- end ----

@@ -1,0 +1,41 @@
+# =====================================================================
+# ROBIN-FPGA: AMD Versal AI Edge VE2302 configuration
+# Inherits from configs/default.yaml; only overrides device-specific fields.
+# =====================================================================
+
+extends: default.yaml
+
+experiment:
+  name: robin_versal
+
+environment:
+  tool: vivado
+  tool_version: "2024.2"
+  device: xcve2302-sfva784-2MP-e-S
+  K_seeds: 10
+  corners:
+    # Eight-corner sweep matching paper's Figure 15
+    - { process: SS, voltage: nominal, temperature: 125 }
+    - { process: SS, voltage: nominal, temperature: 0   }
+    - { process: TT, voltage: nominal, temperature: 25  }
+    - { process: TT, voltage: nominal, temperature: 85  }
+    - { process: FF, voltage: nominal, temperature: -40 }
+    - { process: FF, voltage: nominal, temperature: 125 }
+    - { process: SF, voltage: nominal, temperature: 85  }
+    - { process: FS, voltage: nominal, temperature: 0   }
+  parallel: 8
+
+# Versal-specific reward weights — slightly lower BRAM budget due to
+# AIE-ML tile array on the same die
+reward:
+  util_budgets:
+    LUT:  72.0
+    FF:   72.0
+    BRAM: 75.0
+    DSP:  85.0
+    URAM: 82.0
+
+# Versal has hardened NoC; congestion percentiles are richer
+agent:
+  encoder:
+    tab_feat_dim: 36   # 32 base + 4 NoC-specific

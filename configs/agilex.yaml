@@ -1,0 +1,36 @@
+# =====================================================================
+# ROBIN-FPGA: Intel Agilex 7 AGI 027 configuration
+# Inherits from configs/default.yaml.
+# =====================================================================
+
+extends: default.yaml
+
+experiment:
+  name: robin_agilex
+
+environment:
+  tool: quartus
+  tool_version: "24.1"
+  device: AGIB027R29A1E2VR0
+  K_seeds: 10
+  corners:
+    - { process: SS, voltage: nominal, temperature: 100 }
+    - { process: TT, voltage: nominal, temperature: 25  }
+    - { process: FF, voltage: nominal, temperature: -40 }
+  parallel: 8
+
+# Agilex has HyperFlex retiming registers — different action vocabulary
+agent:
+  policy:
+    action_space_size: 192      # same shape, different bundle composition
+  encoder:
+    tab_feat_dim: 34            # 32 base + 2 HyperFlex-specific
+
+reward:
+  util_budgets:
+    LUT:  68.0       # Agilex ALMs are denser; tighter LUT budget
+    FF:   70.0
+    BRAM: 80.0       # M20K blocks
+    DSP:  80.0
+    URAM: 80.0       # eSRAM
+  clk_period_ns: 4.0  # higher target frequency for Agilex

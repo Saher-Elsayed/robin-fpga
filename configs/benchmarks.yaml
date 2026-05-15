@@ -1,0 +1,39 @@
+# =====================================================================
+# ROBIN-FPGA: 14-design benchmark suite (catalogue alias of manifest.json)
+# Used by scripts/benchmark.sh to iterate over all designs.
+# =====================================================================
+
+manifest: data/benchmarks/manifest.json
+
+splits:
+  train:
+    - FFT-1024
+    - FIR-256
+    - BeamForm-8
+    - GEMM-systolic
+    - MobileNet-V2
+    - BFS
+    - PageRank
+    - PCIe-CSR
+    - NoC-arbiter
+    - Bitonic-1024
+  validation:
+    - Attn-head
+    - AES-128
+  held_out:
+    - SHA-3
+    - NTT
+
+evaluation:
+  num_seeds: 10
+  alpha: 0.05
+  beta: 0.20
+  pareto_strategies: 25
+
+baselines:
+  - B1_defaults
+  - B2_explore
+  - B3_random
+  - B4_TuRBO
+  - B5_DRiLLS
+  - ROBIN-FPGA

@@ -1,0 +1,26 @@
+# =====================================================================
+# ROBIN-FPGA: CVaR beta sensitivity sweep
+# Runs five training jobs across beta values, used for paper Section VIII.
+# =====================================================================
+
+extends: default.yaml
+
+experiment:
+  name: robin_cvar_sweep
+  sweep: true
+
+sweep:
+  parameter: training.cvar_beta
+  values: [0.05, 0.10, 0.20, 0.30, 0.50]
+  parallel_jobs: 5
+  per_job:
+    episodes: 800
+    seeds: [42, 43, 44]
+
+reporting:
+  output_csv: data/results/cvar_sweep.csv
+  metrics:
+    - mean_return
+    - sigma_wns
+    - closure_rate
+    - empirical_coverage

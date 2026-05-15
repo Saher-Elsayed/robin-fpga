@@ -1,0 +1,134 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "robin-fpga"
+version = "0.1.0"
+description = "Distributionally-Robust RL with Conformal Sign-off for FPGA Timing Closure"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [
+    { name = "Saher Elsayed", email = "selsayed@seas.upenn.edu" },
+]
+keywords = [
+    "fpga",
+    "timing-closure",
+    "reinforcement-learning",
+    "graph-neural-networks",
+    "conformal-prediction",
+    "distributionally-robust",
+    "vivado",
+    "quartus",
+    "eda",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)",
+]
+dependencies = [
+    "torch>=2.1.0,<3.0.0",
+    "numpy>=1.24.0,<2.0.0",
+    "scipy>=1.10.0",
+    "pyyaml>=6.0",
+    "jsonschema>=4.17.0",
+    "click>=8.1.0",
+    "rich>=13.0.0",
+    "tqdm>=4.65.0",
+    "tensorboard>=2.13.0",
+    "matplotlib>=3.7.0",
+    "seaborn>=0.12.0",
+    "pandas>=2.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "pytest-xdist>=3.3.0",
+    "ruff>=0.1.0",
+    "black>=23.0.0",
+    "mypy>=1.5.0",
+    "pre-commit>=3.4.0",
+    "types-pyyaml",
+]
+docs = [
+    "sphinx>=7.0.0",
+    "sphinx-rtd-theme>=1.3.0",
+    "myst-parser>=2.0.0",
+    "sphinx-autoapi>=3.0.0",
+]
+wandb = ["wandb>=0.15.0"]
+
+[project.urls]
+Homepage = "https://github.com/saher-elsayed/robin-fpga"
+Documentation = "https://saher-elsayed.github.io/robin-fpga/"
+Repository = "https://github.com/saher-elsayed/robin-fpga"
+Issues = "https://github.com/saher-elsayed/robin-fpga/issues"
+Changelog = "https://github.com/saher-elsayed/robin-fpga/blob/main/CHANGELOG.md"
+
+[project.scripts]
+robin-fpga = "robin_fpga.cli:main"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+# ------- Tooling -------
+
+[tool.black]
+line-length = 100
+target-version = ["py310", "py311", "py312"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+select = ["E", "F", "I", "N", "W", "UP", "B", "C4", "SIM"]
+ignore = ["E501"]   # line length handled by black
+
+[tool.ruff.per-file-ignores]
+"tests/*" = ["N802", "N803"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+check_untyped_defs = true
+disallow_untyped_defs = false
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+addopts = "-v --tb=short --strict-markers"
+markers = [
+    "slow: marks slow tests (deselect with '-m \"not slow\"')",
+    "integration: end-to-end tests requiring vivado or quartus",
+    "gpu: tests requiring a CUDA device",
+]
+
+[tool.coverage.run]
+source = ["src/robin_fpga"]
+omit = ["*/tests/*", "*/__init__.py"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]
