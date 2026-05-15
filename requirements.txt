@@ -28,4 +28,4 @@ tensorboard>=2.13.0
 
 # ------- Build / packaging -------
 setuptools>=68.0.0
-wheel>=0.40.0
+wheel>=0.47.0
