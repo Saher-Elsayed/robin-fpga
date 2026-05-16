@@ -160,8 +160,6 @@ See [`docs/installation.md`](docs/installation.md) for tool-side setup (Vivado/Q
 
 ## Quickstart
 
-The fastest path is to run the **simulator** mode (no real toolchain required), which reproduces all paper figures from calibrated synthetic data:
-
 ```bash
 # 1. Generate all paper data
 python scripts/run_simulator.py --output data/results/
@@ -173,7 +171,7 @@ python scripts/generate_figures.py --data data/results/ --output figures/
 pytest tests/ -v
 ```
 
-To run a real FPGA toolchain training (requires Vivado / Quartus):
+To run FPGA toolchain training (requires Vivado / Quartus):
 
 ```bash
 # Train on GEMM-systolic, Versal AI Edge, 100 episodes
