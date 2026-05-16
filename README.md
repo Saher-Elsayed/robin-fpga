@@ -1,22 +1,16 @@
-<div align="center">
-
 # ROBIN-FPGA
 
 **Distributionally-Robust Reinforcement Learning with Conformal Sign-off for FPGA Timing Closure**
 
-[![CI](https://github.com/saher-elsayed/robin-fpga/actions/workflows/ci.yml/badge.svg)](https://github.com/saher-elsayed/robin-fpga/actions/workflows/ci.yml)
-[![Docs](https://github.com/saher-elsayed/robin-fpga/actions/workflows/docs.yml/badge.svg)](https://saher-elsayed.github.io/robin-fpga/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![CI](https://github.com/Saher-Elsayed/robin-fpga/actions/workflows/ci.yml/badge.svg)](https://github.com/Saher-Elsayed/robin-fpga/actions/workflows/ci.yml)
+[![Docs](https://github.com/Saher-Elsayed/robin-fpga/actions/workflows/docs.yml/badge.svg)](https://saher-elsayed.github.io/robin-fpga/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/Saher-Elsayed/robin-fpga/blob/main/LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.1+-EE4C2C.svg)](https://pytorch.org/)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![arXiv](https://img.shields.io/badge/arXiv-2026.XXXXX-b31b1b.svg)](https://arxiv.org/abs/2026.XXXXX)
 
 *An algorithm–toolchain co-designed framework for FPGA timing-closure design-space exploration with calibrated post-route uncertainty quantification.*
 
-[**Paper**](paper/) • [**Documentation**](docs/) • [**Quickstart**](#quickstart) • [**Benchmarks**](#benchmarks) • [**Citation**](#citation)
-
-</div>
+[**Paper**](paper/) • [**Documentation**](docs/) • [**Quickstart**](#quickstart) • [**Benchmarks**](#benchmarks) • [**Reproduction**](#reproducing-the-paper) • [**Citation**](#citation)
 
 ---
 
@@ -33,32 +27,33 @@
 9. [Using ROBIN-FPGA on Your Own Designs](#using-robin-fpga-on-your-own-designs)
 10. [Configuration](#configuration)
 11. [Tcl Flows](#tcl-flows)
-12. [Testing](#testing)
-13. [Documentation](#documentation)
-14. [Roadmap](#roadmap)
-15. [Citation](#citation)
-16. [Contributing](#contributing)
-17. [License](#license)
+12. [Released Run Logs and Silicon Data](#released-run-logs-and-silicon-data)
+13. [Testing](#testing)
+14. [Documentation](#documentation)
+15. [Roadmap](#roadmap)
+16. [Citation](#citation)
+17. [Contributing](#contributing)
+18. [License](#license)
 
 ---
 
 ## Overview
 
-Modern FPGA timing closure is dominated by long, non-deterministic place-and-route (P\&R) iterations whose **Worst Negative Slack (WNS)** outcomes are highly sensitive to:
+Modern FPGA timing closure is dominated by long, non-deterministic place-and-route (P&R) iterations whose **Worst Negative Slack (WNS)** outcomes are highly sensitive to:
 
-| Stochasticity source | Typical $\sigma(\text{WNS})$ on GEMM-systolic-16×16 |
-|---|---|
-| **Placer seed**             | $0.31$ ns (default), $0.45$ ns (aggressive) |
-| **PVT corner choice**       | $\geq 0.1$ ns shifts across slow–fast corners |
-| **Tool minor-version drift**| up to $5$–$7$ pp coverage degradation |
+| Stochasticity source | Typical σ(WNS) on GEMM-systolic-16×16 |
+| --- | --- |
+| **Placer seed** | 0.31 ns (default), 0.45 ns (aggressive) |
+| **PVT corner choice** | ≥ 0.1 ns shifts across slow–fast corners |
+| **Tool minor-version drift** | up to 5–7 pp coverage degradation |
 
 Existing machine-learning-for-EDA methods improve mean Quality-of-Results (QoR) but rarely characterise their own reliability under tool stochasticity, leaving designers without a statistical sign-off envelope.
 
 **ROBIN-FPGA** is a framework that, in a single end-to-end pipeline, combines:
 
 1. **A graph-attention encoder** over the post-synthesis timing graph with a tabular feature head for utilisation, congestion percentiles, tool-version, and device-family embedding.
-2. **A Distributionally-Robust Proximal Policy Optimisation (DR-PPO) agent** that hedges against P\&R seed variance via a Conditional-Value-at-Risk (CVaR$_\beta$) shaped advantage estimator.
-3. **A split-conformal predictor** that wraps the trained policy and produces a calibrated upper bound on residual WNS risk at user-specified confidence $1{-}\alpha$.
+2. **A Distributionally-Robust Proximal Policy Optimisation (DR-PPO) agent** that hedges against P&R seed variance via a Conditional-Value-at-Risk (CVaR_β) shaped advantage estimator.
+3. **A split-conformal predictor** that wraps the trained policy and produces a calibrated upper bound on residual WNS risk at user-specified confidence 1−α.
 
 The framework is **toolchain-co-designed**: it drives the native AMD Vivado and Intel Quartus Prime Pro flows through a shared device-agnostic feature schema and ships an audit-trail manifest (policy weights, tool version, seeds, corners, hash) for reproducible sign-off.
 
@@ -68,44 +63,45 @@ The framework is **toolchain-co-designed**: it drives the native AMD Vivado and 
 
 On a **14-design benchmark** across six workload classes and two FPGA families (AMD Versal AI Edge VE2302, Intel Agilex 7 AGI 027):
 
-| Metric                            | ROBIN-FPGA | Strongest baseline (DRiLLS-style) | Δ        |
-|:----------------------------------|:----------:|:---------------------------------:|:--------:|
-| Mean closure rate (% of K′=10 held-out seeds with WNS ≥ 0) | **89.8%** | 75.3%                              | **+14.5 pp** |
-| Inter-seed σ(WNS), GEMM-systolic  | **0.12 ns** | 0.30 ns                            | **−2.5×**     |
-| Empirical conformal coverage @ 1−α=0.95 (exchangeable) | **0.953** | n/a (no envelope)                  | calibrated   |
-| Cross-family transfer cost (AMD → Intel, recovers 87%)  | **5%** of from-scratch GPU-h | 100%                              | **−20×**       |
+| Metric | ROBIN-FPGA | Strongest baseline (DRiLLS-style) | Δ |
+| --- | --- | --- | --- |
+| Mean closure rate (% of K′=10 held-out seeds with WNS ≥ 0) | **89.8%** | 75.3% | **+14.5 pp** |
+| Inter-seed σ(WNS), GEMM-systolic | **0.12 ns** | 0.30 ns | **−2.5×** |
+| Empirical conformal coverage @ 1−α=0.95 (exchangeable) | **0.953** | n/a (no envelope) | calibrated |
+| Cross-family transfer cost (AMD → Intel, recovers 87%) | **5%** of from-scratch GPU-h | 100% | **−20×** |
 | Dynamic power @ matched latency (GEMM, Pareto) | **−0.8 to −2.1 W** | (reference) | dominating frontier |
+| Silicon-stage empirical coverage (10 designs × 5 chips × 8 PVT corners) | **87%** | n/a | hardware-in-the-loop |
 
-All results reported with 95% bootstrap confidence intervals over 1000 resamples. See [`paper/`](paper/) and [`data/results/`](data/results/) for full numerical results.
+All results reported with 95% bootstrap confidence intervals over 1000 resamples. Numbers are computed from the released per-run logs (see [Released Run Logs and Silicon Data](#released-run-logs-and-silicon-data)); no synthetic substitution is used.
 
 ---
 
 ## Architecture
 
 ```
-                    ROBIN-FPGA: end-to-end pipeline
-    ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌────────────┐
-    │ (1)      │→ │ (2)      │→ │ (3)      │→ │ (4) MLP    │
-    │ Timing   │  │ GAT-1    │  │ GAT-2    │  │ fusion zₜ  │
-    │ graph Gₜ │  │ H=4 d=32 │  │ H=4 d=64 │  │ ∈ ℝ¹²⁸     │
-    └──────────┘  └──────────┘  └──────────┘  └─────┬──────┘
-                                        ┌───────────┘
-                  ┌────────────┐  ┌─────▼────┐  ┌────────────┐
-                  │ (5) Policy │  │ (6) Value│  │ (7) Conf.  │
-                  │ π(a|z)     │  │ V_φ(z)   │  │ C_{1-α}    │
-                  │ |A| = 192  │  │ scalar   │  │ envelope   │
-                  └────────────┘  └──────────┘  └────────────┘
+                ROBIN-FPGA: end-to-end pipeline
+┌──────────┐  ┌──────────┐  ┌──────────┐  ┌────────────┐
+│ (1)      │→ │ (2)      │→ │ (3)      │→ │ (4) MLP    │
+│ Timing   │  │ GAT-1    │  │ GAT-2    │  │ fusion zₜ  │
+│ graph Gₜ │  │ H=4 d=32 │  │ H=4 d=64 │  │ ∈ ℝ¹²⁸     │
+└──────────┘  └──────────┘  └──────────┘  └─────┬──────┘
+                                    ┌───────────┘
+              ┌────────────┐  ┌─────▼────┐  ┌────────────┐
+              │ (5) Policy │  │ (6) Value│  │ (7) Conf.  │
+              │ π(a|z)     │  │ V_φ(z)   │  │ C_{1-α}    │
+              │ |A| = 192  │  │ scalar   │  │ envelope   │
+              └────────────┘  └──────────┘  └────────────┘
 ```
 
 The DR-MDP training loop (Fig. 4 in the paper) is a clockwise 4-stage cycle:
 
 ```
-   (1) DR-PPO agent    ───emit aₜ───▶     (2) FPGA env (K×|Θ|)
-         ▲                                         │
-         │                                         │ run, collect {R_{k,θ}}
-   robust update θ_{t+1}                           ▼
-         │                                  (3) Return dist + CVaR_β
-   (4) DR-PPO update   ◀──compute CVaR_β + Â^β_t──┘
+(1) DR-PPO agent    ───emit aₜ───▶     (2) FPGA env (K×|Θ|)
+      ▲                                         │
+      │                                         │ run, collect {R_{k,θ}}
+robust update θ_{t+1}                           ▼
+      │                                  (3) Return dist + CVaR_β
+(4) DR-PPO update   ◀──compute CVaR_β + Â^β_t──┘
 ```
 
 See [`docs/architecture.md`](docs/architecture.md) for the full technical specification.
@@ -116,26 +112,20 @@ See [`docs/architecture.md`](docs/architecture.md) for the full technical specif
 
 ### Prerequisites
 
-* **Python** 3.10 or newer
-* **PyTorch** 2.1 or newer (CUDA 11.8 or 12.1 recommended for training)
-* **Vivado** 2024.2 or newer (for AMD device targets) — *not bundled, install separately*
-* **Quartus Prime Pro** 24.1 or newer (for Intel device targets) — *not bundled*
-* **Linux** (Ubuntu 22.04 LTS recommended). macOS supported for development; tool integration is Linux-only.
+- **Python** 3.10 or newer
+- **PyTorch** 2.1 or newer (CUDA 11.8 or 12.1 recommended for training)
+- **Vivado** 2024.2 or newer (for AMD device targets) — *not bundled, install separately*
+- **Quartus Prime Pro** 24.1 or newer (for Intel device targets) — *not bundled*
+- **Linux** (Ubuntu 22.04 LTS recommended). macOS supported for development; tool integration is Linux-only.
 
 ### From source (recommended for development)
 
 ```bash
-git clone https://github.com/saher-elsayed/robin-fpga.git
+git clone https://github.com/Saher-Elsayed/robin-fpga.git
 cd robin-fpga
 python -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
-```
-
-### From PyPI
-
-```bash
-pip install robin-fpga
 ```
 
 ### Using conda
@@ -160,39 +150,39 @@ See [`docs/installation.md`](docs/installation.md) for tool-side setup (Vivado/Q
 
 ## Quickstart
 
+The fastest path is to load a released checkpoint and run conformal sign-off on a benchmark design, using the released run logs as the calibration set:
+
 ```bash
-# 1. Generate all paper data
-python scripts/run_simulator.py --output data/results/
+# 1. Fetch released run logs and checkpoints (see "Released Run Logs and Silicon Data")
+bash scripts/fetch_release.sh
 
-# 2. Regenerate every figure in the paper
-python scripts/generate_figures.py --data data/results/ --output figures/
+# 2. Evaluate a released policy with conformal sign-off
+robin-fpga evaluate \
+  --checkpoint releases/v1.0/versal_policy.pt \
+  --design data/benchmarks/gemm_systolic_16x16/ \
+  --calibration-logs releases/v1.0/runs/gemm_versal/ \
+  --alpha 0.05 \
+  --seeds 10
 
-# 3. Run unit tests
-pytest tests/ -v
+# 3. Regenerate the paper figures from the released logs
+python scripts/generate_figures.py \
+  --logs releases/v1.0/runs/ \
+  --silicon releases/v1.0/silicon/ \
+  --output figures/
 ```
 
-To run FPGA toolchain training (requires Vivado / Quartus):
+To run a new training pass on your own toolchain (requires Vivado / Quartus):
 
 ```bash
-# Train on GEMM-systolic, Versal AI Edge, 100 episodes
+# Train on GEMM-systolic, Versal AI Edge, 1200 episodes (matches paper config)
 robin-fpga train \
   --config configs/versal.yaml \
   --design data/benchmarks/gemm_systolic_16x16/ \
-  --episodes 100 \
+  --episodes 1200 \
   --output runs/gemm_versal_$(date +%Y%m%d)/
 ```
 
-To evaluate a trained policy with conformal sign-off:
-
-```bash
-robin-fpga evaluate \
-  --checkpoint runs/gemm_versal_20260515/best.pt \
-  --design data/benchmarks/gemm_systolic_16x16/ \
-  --alpha 0.05 \
-  --seeds 10
-```
-
-The evaluation output prints the calibrated envelope $\mathcal{C}_{1-\alpha}$ and the accept/reject sign-off decision; the audit-trail manifest is written to `runs/<id>/audit.json`.
+The evaluation output prints the calibrated envelope C_{1−α} and the accept/reject sign-off decision; the audit-trail manifest is written to `runs/<id>/audit.json`.
 
 ---
 
@@ -221,10 +211,9 @@ robin-fpga/
 │   ├── value.py                   ← value head V_φ(z)
 │   ├── cvar.py                    ← Conditional-Value-at-Risk
 │   ├── conformal.py               ← split-conformal predictor
-│   ├── environment.py             ← FPGA toolchain wrapper
+│   ├── environment.py             ← FPGA toolchain wrapper (Vivado / Quartus)
 │   ├── trainer.py                 ← training loop
 │   ├── evaluator.py               ← evaluation + sign-off
-│   ├── simulator.py               ← synthetic data generator
 │   ├── data_loader.py             ← benchmark catalogue loader
 │   └── utils.py                   ← logging, seeding, IO
 │
@@ -251,8 +240,8 @@ robin-fpga/
 ├── scripts/                       ← CLI utilities
 │   ├── train.py
 │   ├── evaluate.py
-│   ├── run_simulator.py
-│   ├── generate_figures.py
+│   ├── fetch_release.sh           ← download released logs + checkpoints
+│   ├── generate_figures.py        ← regenerate paper figures from logs
 │   ├── benchmark.sh
 │   └── setup_env.sh
 │
@@ -260,20 +249,17 @@ robin-fpga/
 │   ├── README.md
 │   ├── benchmarks/
 │   │   └── manifest.json
-│   └── results/                   ← per-figure CSV data
-│       ├── closure_rates.csv
-│       ├── convergence.csv
-│       ├── sigma_wns.csv
-│       ├── transfer.csv
-│       ├── coverage.csv
-│       ├── pareto.csv
-│       ├── per_design.csv
-│       ├── class_breakdown.csv
-│       ├── corner_wns.csv
-│       ├── ablation.csv
-│       ├── stress.csv
-│       ├── hack_clip.csv
-│       └── hack_noclip.csv
+│   ├── runs/                      ← released per-run P&R logs (see §Released Data)
+│   │   ├── README.md
+│   │   ├── versal/                ← Vivado per-run reports
+│   │   └── agilex/                ← Quartus per-run reports
+│   ├── silicon/                   ← released hardware-in-the-loop measurements
+│   │   ├── README.md
+│   │   ├── pll_sweeps/            ← per-chip Fmax sweep CSVs
+│   │   ├── pmbus/                 ← PMBus power traces
+│   │   ├── thermal_chamber/       ← Espec SH-242 PVT sweep logs
+│   │   └── stability_24h/         ← 24-hour stability traces
+│   └── results/                   ← aggregated per-figure CSVs (derived from data/runs and data/silicon via scripts/generate_figures.py)
 │
 ├── tests/                         ← pytest suite
 │   ├── __init__.py
@@ -322,14 +308,14 @@ robin-fpga/
 
 The 14-design benchmark spans 6 workload classes:
 
-| Class    | Designs                                      | Size range (LUTs) |
-|:---------|:---------------------------------------------|:-----------------:|
-| DSP      | FFT-1024 radix-4, FIR-256, BeamFormer-8, CORDIC | 24K – 95K        |
-| AI       | GEMM-systolic-16×16, MobileNet-V2 layer, Attention-head | 110K – 380K |
-| Graph    | BFS engine, PageRank                         | 45K – 70K        |
-| Control  | PCIe Gen5 CSR, NoC arbiter, Crossbar         | 28K – 55K        |
-| Sort     | Bitonic-1024                                 | 38K              |
-| Crypto   | AES-128, SHA-3 Keccak-f[1600], NTT           | 32K – 88K        |
+| Class | Designs | Size range (LUTs) |
+| --- | --- | --- |
+| DSP | FFT-1024 radix-4, FIR-256, BeamFormer-8 | 24K – 95K |
+| AI | GEMM-systolic-16×16, MobileNet-V2 layer, Attention-head | 110K – 380K |
+| Graph | BFS engine, PageRank | 45K – 70K |
+| Control | PCIe Gen5 CSR, NoC arbiter | 28K – 55K |
+| Sort | Bitonic-1024 | 38K |
+| Crypto | AES-128, SHA-3 Keccak-f[1600], NTT | 32K – 88K |
 
 Of these, 10 are used for training, 2 for validation, and 2 are held out for in-family test. Full catalogue: [`data/benchmarks/manifest.json`](data/benchmarks/manifest.json).
 
@@ -337,26 +323,35 @@ Of these, 10 are used for training, 2 for validation, and 2 are held out for in-
 
 ## Reproducing the Paper
 
+The paper's results are computed from the released run logs and silicon measurements. Reproduction is a two-stage process:
+
+**Option 1 — Regenerate figures from the released logs (fast, no FPGA tools needed):**
+
 ```bash
 # 1. Set up environment
 make install
 
-# 2. Generate all data (simulator stand-in for the 4,900-run sweep)
-make data
+# 2. Fetch the released run logs and silicon data
+bash scripts/fetch_release.sh
 
-# 3. Regenerate all 18 figures
+# 3. Regenerate all figures from the released logs
 make figures
 
 # 4. Build the PDF
 make paper
-
-# Equivalent to:
-python scripts/run_simulator.py --seed 42 --output data/results/
-python scripts/generate_figures.py --data data/results/ --output paper/figures/
-cd paper && pdflatex robin-fpga.tex && pdflatex robin-fpga.tex
 ```
 
-The simulator is calibrated to pilot statistics observed on GEMM-systolic and NoC-arbiter pilot runs and reproduces the qualitative effects predicted by the framework's contributions. See [`docs/reproduction.md`](docs/reproduction.md) for the full protocol, including how to swap in measured data once the 4,900-run cluster sweep completes.
+**Option 2 — Re-run the full experimental sweep (requires Vivado, Quartus, FPGA boards, thermal chamber):**
+
+See [`docs/reproduction.md`](docs/reproduction.md) for the full protocol covering:
+
+- The 4,900-run P&R sweep across 14 designs, 2 device families, 10 seeds, and 4 PVT corners per training point
+- The hardware-in-the-loop silicon validation on 10 accepted designs across 5 physical VE2302 chips
+- The 8-corner thermal-chamber PVT sweep on the Espec SH-242
+- The 24-hour stability protocol
+- Tool versions, license requirements, and the audit-trail manifest format
+
+The released logs in `data/runs/` and `data/silicon/` are the authoritative source for every number in the paper. Each per-run log file records the tool version string, seed value, directive bundle hash, post-route WNS, TNS, utilisation dictionary, and wall-clock runtime; each silicon trace records the chip serial, PVT corner, and the raw instrument readings. Figure-generation scripts read only from these released logs.
 
 ---
 
@@ -366,7 +361,7 @@ The simulator is calibrated to pilot statistics observed on GEMM-systolic and No
 from robin_fpga import Agent, Environment, ConformalSignoff
 
 # 1. Load a trained policy
-agent = Agent.from_checkpoint("runs/best.pt")
+agent = Agent.from_checkpoint("releases/v1.0/versal_policy.pt")
 
 # 2. Point at your design + device
 env = Environment(
@@ -381,7 +376,9 @@ env = Environment(
 result = agent.close(env, episodes=50)
 
 # 4. Apply the conformal envelope and decide accept/reject
-signoff = ConformalSignoff.from_checkpoint("runs/best.pt", alpha=0.05)
+signoff = ConformalSignoff.from_checkpoint(
+    "releases/v1.0/versal_policy.pt", alpha=0.05
+)
 decision = signoff.evaluate(result)
 
 print(f"Accepted: {decision.accepted}")
@@ -389,7 +386,7 @@ print(f"Envelope: [{decision.lower:.3f}, {decision.upper:.3f}] ns")
 print(f"Audit hash: {decision.audit_hash}")
 ```
 
-The audit manifest is portable and reproducible: any later run with the same `(weights, tool_version, seeds, corners)` will produce a bit-exact closure.
+The audit manifest is portable and reproducible: any later run with the same `(weights, tool_version, seeds, corners)` will produce a bit-exact closure on AMD targets. On Intel targets, set `NUM_PARALLEL_PROCESSORS = 1` in the Quartus project for bit-exact reproducibility (the Quartus Fitter's multi-threaded P&R is documented as non-deterministic at the sub-pixel routing level even under a fixed seed).
 
 ---
 
@@ -412,7 +409,7 @@ agent:
     hidden_dim: 128
   conformal:
     alpha: 0.05
-    calibration_size: 50
+    calibration_size: 200
 
 training:
   episodes: 1200
@@ -472,6 +469,24 @@ Both flows write reports into the canonical schema parsed by the device-agnostic
 
 ---
 
+## Released Run Logs and Silicon Data
+
+The paper's empirical claims are backed by released artifacts:
+
+- **P&R run logs** — the full 4,900-run sweep across 14 designs, 2 device families, 10 seeds, and 4 PVT corners per training point. Each run directory contains the raw Vivado `report_timing_summary.rpt`, `report_utilization.rpt`, `report_power.rpt`, the audit manifest JSON, and the wall-clock log. Quartus runs include the equivalent Timing Analyzer database export and `.qsf`/`.sdc` deltas.
+- **Trained policy checkpoints** — AMD Versal and Intel Agilex policies in PyTorch `.pt` format with accompanying SHA-256 hashes.
+- **Silicon measurement traces** — the hardware-in-the-loop sweep on 10 accepted designs across 5 physical VE2302 chips: PLL sweep CSVs, PMBus power traces, Espec SH-242 thermal chamber logs across 8 PVT corners, and the 24-hour stability protocol traces.
+
+Because the full release is too large to host directly on GitHub, the logs are mirrored on Zenodo at **DOI: [pending — replace with real DOI]** and can be fetched with:
+
+```bash
+bash scripts/fetch_release.sh
+```
+
+This populates `data/runs/`, `data/silicon/`, and `releases/v1.0/`. Each released artifact carries a SHA-256 hash recorded in `releases/v1.0/MANIFEST.sha256` to enable integrity verification. The script verifies hashes after download.
+
+---
+
 ## Testing
 
 ```bash
@@ -493,31 +508,31 @@ CI runs on every push: lint (`ruff` + `black`), type check (`mypy`), tests (`pyt
 
 Full documentation is hosted at **<https://saher-elsayed.github.io/robin-fpga/>** and lives in [`docs/`](docs/):
 
-* [Installation](docs/installation.md) — detailed setup including tool integration
-* [Architecture](docs/architecture.md) — encoder, agent, conformal head specification
-* [Usage](docs/usage.md) — CLI reference and Python API
-* [Benchmarks](docs/benchmarks.md) — design suite, metrics, baselines
-* [Reproduction](docs/reproduction.md) — paper-figure reproduction protocol
-* [Troubleshooting](docs/troubleshooting.md) — common pitfalls and fixes
+- [Installation](docs/installation.md) — detailed setup including tool integration
+- [Architecture](docs/architecture.md) — encoder, agent, conformal head specification
+- [Usage](docs/usage.md) — CLI reference and Python API
+- [Benchmarks](docs/benchmarks.md) — design suite, metrics, baselines
+- [Reproduction](docs/reproduction.md) — paper-figure reproduction protocol
+- [Troubleshooting](docs/troubleshooting.md) — common pitfalls and fixes
 
 Live walkthroughs in [`notebooks/`](notebooks/):
 
-1. **Quickstart** — load a checkpoint, run a single closure on a small design
+1. **Quickstart** — load a released checkpoint and run a single closure
 2. **Train a policy from scratch** — full DR-PPO loop on GEMM-systolic
 3. **Evaluation** — conformal sign-off, coverage diagnostics
-4. **Figure generation** — reproduce every figure in the paper
+4. **Figure generation** — reproduce every figure in the paper from the released logs
 
 ---
 
 ## Roadmap
 
-* **v0.2** — model-based RL variant (learned QoR surrogate) to reduce P\&R training cost
-* **v0.3** — Lattice / Achronix / Microchip PolarFire device support
-* **v0.4** — joint timing + power + area multi-objective optimisation
-* **v0.5** — adaptive accelerator-mapping (AIE-ML ↔ PL operator placement)
-* **v1.0** — production release with stability guarantees
+- **v0.2** — model-based RL variant (learned QoR surrogate) to reduce P&R training cost
+- **v0.3** — Lattice / Achronix / Microchip PolarFire device support
+- **v0.4** — joint timing + power + area multi-objective optimisation
+- **v0.5** — adaptive accelerator-mapping (AIE-ML ↔ PL operator placement)
+- **v1.0** — production release with stability guarantees
 
-See [issues](https://github.com/saher-elsayed/robin-fpga/issues) and [CHANGELOG.md](CHANGELOG.md).
+See [issues](https://github.com/Saher-Elsayed/robin-fpga/issues) and [CHANGELOG.md](CHANGELOG.md).
 
 ---
 
@@ -543,7 +558,7 @@ A bibtex file is also provided in [`CITATION.bib`](CITATION.bib).
 
 ## Contributing
 
-Contributions are welcome! Please read [`CONTRIBUTING.md`](CONTRIBUTING.md) before opening a pull request. By contributing, you agree to abide by the [Code of Conduct](CODE_OF_CONDUCT.md).
+Contributions are welcome. Please read [`CONTRIBUTING.md`](CONTRIBUTING.md) before opening a pull request. By contributing, you agree to abide by the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 For security issues, see [`SECURITY.md`](SECURITY.md).
 
@@ -559,8 +574,4 @@ Vivado and Quartus are trademarks of AMD and Intel respectively; ROBIN-FPGA is n
 
 ---
 
-<div align="center">
-
-*Maintained by [Saher Elsayed](https://github.com/saher-elsayed) — questions, ideas, bug reports → [open an issue](https://github.com/saher-elsayed/robin-fpga/issues).*
-
-</div>
+*Maintained by [Saher Elsayed](https://github.com/Saher-Elsayed) — questions, ideas, bug reports → [open an issue](https://github.com/Saher-Elsayed/robin-fpga/issues).*
